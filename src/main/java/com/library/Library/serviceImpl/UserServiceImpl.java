@@ -57,13 +57,6 @@ public class UserServiceImpl implements UserService{
             if(!userOptional.isPresent()){
                 throw new RuntimeException("User Id is invalid");
             }
-            if(barcode.equals("barcode1") && userId.equals(10L)){
-                try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
             bookInventory.setBorrowedTimeSeconds(System.currentTimeMillis()/1000);
             bookInventory.setCurrentUserId(userId);
             bookInventoryRepo.save(bookInventory);
