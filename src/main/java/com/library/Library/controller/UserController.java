@@ -59,4 +59,15 @@ public class UserController {
         return new ResponseEntity<>(GenericResponseDTO.generateSuccessResponseDTO("book Successfully returned"),HttpStatus.OK);
     }
 
+    @RequestMapping(path = "/reissue/{userId}/{barcode}", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<GenericResponseDTO> reissue(@PathVariable("userId")Long userId,
+                                                      @PathVariable("barcode") String barcode){
+        try{
+            userService.reissue(userId, barcode);
+        }catch (Exception e){
+            return new ResponseEntity<>(GenericResponseDTO.generateErrorResponseDTO(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(GenericResponseDTO.generateSuccessResponseDTO("book reissued successfully"),HttpStatus.OK);
+    }
 }
