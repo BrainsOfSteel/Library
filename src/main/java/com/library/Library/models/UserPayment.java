@@ -25,7 +25,7 @@ public class UserPayment {
     @JoinColumn(name = "user_inventory_history_id")
     private UserBookInventoryHistory userBookInventoryHistory;
 
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
     @Column(name = "due_to_pay")

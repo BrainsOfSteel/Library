@@ -1,5 +1,6 @@
 package com.library.Library.serviceImpl;
 
+import com.library.Library.com.library.Library.dto.PaymentDueDTO;
 import com.library.Library.com.library.Library.dto.Tuple;
 import com.library.Library.dao.BookInventoryRepo;
 import com.library.Library.dao.UserBookInventoryHistoryRepo;
@@ -14,8 +15,12 @@ import com.library.Library.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -103,7 +108,8 @@ public class UserServiceImpl implements UserService{
                 throw new RuntimeException("Unable to calculate fine: Rolling back", e);
             }
             Long currentTimeSeconds = System.currentTimeMillis() / 1000;
-            UserPayment userPayment = new UserPayment(history, fineCalculation, null, false, false, currentTimeSeconds,
+            boolean clearedFlag = fineCalculation < 1;
+            UserPayment userPayment = new UserPayment(history, fineCalculation, null, clearedFlag, false, currentTimeSeconds,
                     currentTimeSeconds, userId);
             userPaymentRepo.save(userPayment);
             bookInventoryRepo.save(bookInventory);
@@ -127,5 +133,48 @@ public class UserServiceImpl implements UserService{
         Tuple<Optional<User>, BookInventory> userAndInventory = getUserAndInventory(userId, barcode);
         returnBook(userAndInventory.getV1().get(), userAndInventory.getV2());
         borrowBook(userAndInventory.getV1().get(), userAndInventory.getV2());
+    }
+
+    @Override
+    @Transactional
+    public List<PaymentDueDTO> getPaymentDuesForUser(Long userId){
+        List<UserPayment> userPayments = userPaymentRepo.findByUserIdAndClearedFalse(userId);
+
+        if(CollectionUtils.isEmpty(userPayments)){
+            return Collections.emptyList();
+        }
+
+        List<PaymentDueDTO> paymentDueDTOS = new ArrayList<>();
+        for(UserPayment userPayment : userPayments){
+            PaymentDueDTO dto = new PaymentDueDTO(userPayment.getId(), userId, userPayment.getDueToPay());
+            paymentDueDTOS.add(dto);
+        }
+
+        return paymentDueDTOS;
+    }
+
+    @Override
+    @Transactional
+    public void payDues(Long userId, List<Long> paymentIds, Double amount){
+        List<UserPayment> userPayments = userPaymentRepo.findByIdIn(paymentIds);
+        Double amountCalculated = 0.0;
+        if(!CollectionUtils.isEmpty(userPayments)){
+            for(UserPayment payment : userPayments){
+                amountCalculated+=payment.getDueToPay();
+            }
+            if(amountCalculated > amount){
+                throw new RuntimeException("Amount insufficient");
+            }
+            else if (amountCalculated < amount){
+                throw new RuntimeException("Amount greater");
+            }
+            else{
+                for(UserPayment payment : userPayments){
+                    payment.setCleared(true);
+                    payment.setPaidAmount(payment.getDueToPay());
+                }
+                userPaymentRepo.saveAll(userPayments);
+            }
+        }
     }
 }

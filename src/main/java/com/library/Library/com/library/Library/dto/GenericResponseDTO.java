@@ -2,9 +2,18 @@ package com.library.Library.com.library.Library.dto;
 
 import java.io.Serializable;
 
-public class GenericResponseDTO implements Serializable {
+public class GenericResponseDTO<T> implements Serializable {
     private String message;
     private String statusCode;
+    private T data;
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
 
     public String getStatusCode() {
         return statusCode;
@@ -48,5 +57,14 @@ public class GenericResponseDTO implements Serializable {
         dto.setMessage(msg);
         dto.setStatusCode("500");
         return dto;
+    }
+
+    public GenericResponseDTO(String message, String statusCode, T data) {
+        this.message = message;
+        this.statusCode = statusCode;
+        this.data = data;
+    }
+
+    public GenericResponseDTO() {
     }
 }

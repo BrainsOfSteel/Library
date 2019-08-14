@@ -1,6 +1,7 @@
 package com.library.Library.controller;
 
 import com.library.Library.com.library.Library.dto.GenericResponseDTO;
+import com.library.Library.com.library.Library.dto.PaymentDueDTO;
 import com.library.Library.request.UserCreateRequest;
 import com.library.Library.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
 
 @Controller
 @RequestMapping(path = "/user")
@@ -69,5 +73,27 @@ public class UserController {
             return new ResponseEntity<>(GenericResponseDTO.generateErrorResponseDTO(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(GenericResponseDTO.generateSuccessResponseDTO("book reissued successfully"),HttpStatus.OK);
+    }
+
+    @RequestMapping(path = "/unpaidDues/{userId}", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<GenericResponseDTO> getUnpaidDues(@PathVariable("userId")Long userId){
+        try{
+            GenericResponseDTO<List<PaymentDueDTO>> response = new GenericResponseDTO<>("Data returned successfully" , "200" , userService.getPaymentDuesForUser(userId));
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(GenericResponseDTO.generateErrorResponseDTO(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @RequestMapping(path = "/payDues/{userId}/{amount}")
+    @ResponseBody
+    public ResponseEntity<GenericResponseDTO> payDues(@PathVariable("userId")Long userId, @PathVariable("amount") double amount, @RequestParam(value= "paymentId") List<Long> paymentIds) {
+        try{
+            userService.payDues(userId, paymentIds, amount);
+        }catch (Exception e){
+            return new ResponseEntity<>(GenericResponseDTO.generateErrorResponseDTO(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(GenericResponseDTO.generateSuccessResponseDTO("Dues cleared successfully"),HttpStatus.OK);
     }
 }
