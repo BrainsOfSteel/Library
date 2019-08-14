@@ -158,9 +158,13 @@ public class UserServiceImpl implements UserService{
     public void payDues(Long userId, List<Long> paymentIds, Double amount){
         List<UserPayment> userPayments = userPaymentRepo.findByIdIn(paymentIds);
         Double amountCalculated = 0.0;
+        //To handle cases if user tries to clear bills from two different machines concurrently
         if(!CollectionUtils.isEmpty(userPayments)){
             for(UserPayment payment : userPayments){
-                amountCalculated+=payment.getDueToPay();
+                if(payment.isCleared()){
+                    throw new RuntimeException("Already cleared: Not needed to be cleared again");
+                }
+                amountCalculated += payment.getDueToPay();
             }
             if(amountCalculated > amount){
                 throw new RuntimeException("Amount insufficient");
