@@ -156,7 +156,7 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public void payDues(Long userId, List<Long> paymentIds, Double amount){
-        List<UserPayment> userPayments = userPaymentRepo.findByIdIn(paymentIds);
+        List<UserPayment> userPayments = userPaymentRepo.findByIdInAndDeletedFalse(paymentIds);
         Double amountCalculated = 0.0;
         //To handle cases if user tries to clear bills from two different machines concurrently
         if(!CollectionUtils.isEmpty(userPayments)){

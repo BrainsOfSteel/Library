@@ -1,5 +1,6 @@
 package com.library.Library.controller;
 
+import com.library.Library.com.library.Library.dto.BooksDetailsDTO;
 import com.library.Library.com.library.Library.dto.GenericResponseDTO;
 import com.library.Library.com.library.Library.dto.PendingDueInfoDTO;
 import com.library.Library.request.BookAndAuthorRequest;
@@ -57,6 +58,18 @@ public class AdminController {
         try{
             GenericResponseDTO<List<PendingDueInfoDTO>> responseDTO = new GenericResponseDTO<>("Dues Information", "200",
                     bookAuthorAndInventoryService.getAllUserAndDuesInfo());
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(GenericResponseDTO.generateErrorResponseDTO(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @RequestMapping(path = "/inventoryDetails", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<GenericResponseDTO> getInventoryDetails(){
+        try{
+            GenericResponseDTO<List<BooksDetailsDTO>> responseDTO = new GenericResponseDTO<>("Dues Information", "200",
+                    bookAuthorAndInventoryService.getBookInventoryDetails());
             return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity<>(GenericResponseDTO.generateErrorResponseDTO(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);

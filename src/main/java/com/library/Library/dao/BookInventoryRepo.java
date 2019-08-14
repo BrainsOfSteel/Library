@@ -12,4 +12,7 @@ public interface BookInventoryRepo extends JpaRepository<BookInventory, Integer>
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     BookInventory findByBarcode(String barcode);
+
+    int countBookInventoryByBookIdAndDeletedFalse(Integer bookId);
+    int countBookInventoryByBookIdAndCurrentUserIdAndDeletedFalse(Integer bookId, Long currentUserId);
 }

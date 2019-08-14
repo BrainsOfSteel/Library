@@ -1,5 +1,6 @@
 package com.library.Library.service;
 
+import com.library.Library.com.library.Library.dto.BooksDetailsDTO;
 import com.library.Library.com.library.Library.dto.PaymentDueDTO;
 import com.library.Library.models.BookInventory;
 import com.library.Library.models.User;

@@ -1,5 +1,6 @@
 package com.library.Library.service;
 
+import com.library.Library.com.library.Library.dto.BooksDetailsDTO;
 import com.library.Library.com.library.Library.dto.PendingDueInfoDTO;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,4 +14,7 @@ public interface BookAuthorAndInventoryService {
 
     @Transactional
     List<PendingDueInfoDTO> getAllUserAndDuesInfo();
+
+    @Transactional
+    List<BooksDetailsDTO> getBookInventoryDetails();
 }

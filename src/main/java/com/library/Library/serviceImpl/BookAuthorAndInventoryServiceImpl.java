@@ -1,5 +1,6 @@
 package com.library.Library.serviceImpl;
 
+import com.library.Library.com.library.Library.dto.BooksDetailsDTO;
 import com.library.Library.com.library.Library.dto.PaymentDueDTO;
 import com.library.Library.com.library.Library.dto.PendingDueInfoDTO;
 import com.library.Library.dao.AuthorRepo;
@@ -138,5 +139,24 @@ public class BookAuthorAndInventoryServiceImpl implements BookAuthorAndInventory
             pendingDueInfoDTOS.add(pendingDueInfoDTO);
         }
         return pendingDueInfoDTOS;
+    }
+
+    @Override
+    @Transactional
+    public List<BooksDetailsDTO> getBookInventoryDetails(){
+        List<BookType> bookTypes = bookRepo.findAll();
+        List<BooksDetailsDTO> booksDetailsDTOS = new ArrayList<>();
+        if(CollectionUtils.isEmpty(bookTypes)){
+            return new ArrayList<>();
+        }
+
+        for(BookType bookType : bookTypes){
+            int availableBooks = bookInventoryRepo.countBookInventoryByBookIdAndCurrentUserIdAndDeletedFalse(bookType.getId(), null);
+            int totalBooks = bookInventoryRepo.countBookInventoryByBookIdAndDeletedFalse(bookType.getId());
+            BooksDetailsDTO dto = new BooksDetailsDTO(totalBooks, availableBooks, bookType.getBookType(), bookType.getBookTitle());
+            booksDetailsDTOS.add(dto);
+        }
+
+        return booksDetailsDTOS;
     }
 }

@@ -13,5 +13,5 @@ public interface UserPaymentRepo extends JpaRepository<UserPayment, Long>{
     List<UserPayment> findAllByClearedFalseAndDeletedFalse();
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    List<UserPayment> findByIdIn(List<Long> ids);
+    List<UserPayment> findByIdInAndDeletedFalse(List<Long> ids);
 }
